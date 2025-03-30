@@ -3,7 +3,6 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from .managers import CustomUserManager
 
-# User roles defined separately for maintainability
 USER_ROLES = [
     ('admin', 'Administrator'),
     ('seller', 'Seller'),
@@ -13,7 +12,7 @@ USER_ROLES = [
 class CustomUser(AbstractUser):
     """Custom user model replacing the default Django user"""
 
-    username = None  # Disable default username field
+    username = None
     email = models.EmailField(unique=True, verbose_name='Email')
     phone_number = models.CharField(max_length=20, unique=True, verbose_name='Phone Number')
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Avatar')
@@ -55,7 +54,7 @@ class Store(models.Model):
     
     def clean(self):
         if self.user.role == 'buyer':
-            raise ValidationError("A buyer cannot be the owner of a store.")
+            raise ValidationError('A buyer cannot be the owner of a store.')
 
     def save(self, *args, **kwargs):
         self.clean()

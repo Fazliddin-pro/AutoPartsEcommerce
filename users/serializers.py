@@ -39,18 +39,34 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class AddressSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Address
         fields = ['id', 'city', 'street', 'house', 'apartment', 'postal_code', 'is_default', 'user']
         read_only_fields = ['user']
 
+    def create(self, validated_data):
+        user_id = self.context.get('user_id')
+        if not user_id:
+            raise serializers.ValidationError('User ID is required in context')
+
+        user = User.objects.get(id=user_id)
+        return Address.objects.create(user=user, **validated_data)
+
 
 class StoreSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Store
         fields = ['id', 'name', 'logo', 'description', 'is_active', 'user']
         read_only_fields = ['user']
+
+    def create(self, validated_data):
+        user_id = self.context.get('user_id')
+        if not user_id:
+            raise serializers.ValidationError('User ID is required in context')
+
+        user = User.objects.get(id=user_id)
+        return Store.objects.create(user=user, **validated_data)

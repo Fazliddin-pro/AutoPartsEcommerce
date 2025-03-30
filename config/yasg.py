@@ -3,7 +3,6 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
-# Define API schema and metadata
 schema_view = get_schema_view(
     openapi.Info(
         title="AutoPartsEcommerce API",
@@ -13,8 +12,8 @@ schema_view = get_schema_view(
         contact=openapi.Contact(email="support@autopartsecommerce.com"),
         license=openapi.License(name="MIT License"),
     ),
-    public=True,  # Allow public access to the documentation
-    permission_classes=[permissions.AllowAny],  # No authentication required
+    public=True,
+    permission_classes=[permissions.AllowAny],
 )
 
 # Define URL patterns for Swagger and ReDoc
