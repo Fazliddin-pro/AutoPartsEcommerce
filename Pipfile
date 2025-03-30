@@ -17,6 +17,7 @@ requests = "*"
 social-auth-core = "*"
 python-decouple = "*"
 drf-social-oauth2 = "*"
+drf-yasg = "*"
 
 [dev-packages]
 

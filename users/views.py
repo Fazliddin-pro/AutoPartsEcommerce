@@ -55,7 +55,7 @@ class StoreListCreateView(generics.ListCreateAPIView):
         return Store.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        if self.request.user.role != 'seller':  # Проверяем, что user = seller
+        if self.request.user.role != 'seller':
             raise PermissionDenied('Only sellers can create a store.')
         serializer.save(user=self.request.user)
 

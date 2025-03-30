@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 from .managers import CustomUserManager
 
@@ -51,6 +52,14 @@ class Store(models.Model):
     logo = models.ImageField(upload_to='store_logos/', blank=True, null=True, verbose_name='Logo')
     description = models.TextField(blank=True, null=True, verbose_name='Store Description')
     is_active = models.BooleanField(default=True, verbose_name='Is Active')
+    
+    def clean(self):
+        if self.user.role == 'buyer':
+            raise ValidationError("A buyer cannot be the owner of a store.")
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
