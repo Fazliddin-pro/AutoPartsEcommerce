@@ -18,6 +18,9 @@ social-auth-core = "*"
 python-decouple = "*"
 drf-social-oauth2 = "*"
 drf-yasg = "*"
+django-filter = "*"
+django-cors-headers = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 

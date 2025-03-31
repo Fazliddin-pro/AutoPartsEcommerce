@@ -31,7 +31,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         try:
             validate_password(validated_data['password'])
         except ValidationError as e:
-            raise serializers.ValidationError({"password": e.messages})
+            raise serializers.ValidationError({'password': e.messages})
 
         user.set_password(validated_data['password'])
         user.save()
@@ -57,11 +57,18 @@ class AddressSerializer(serializers.ModelSerializer):
 
 class StoreSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
+    products_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Store
-        fields = ['id', 'name', 'logo', 'description', 'is_active', 'user']
+        fields = ['id', 'name', 'logo', 'description', 'is_active', 'products_url', 'user']
         read_only_fields = ['user']
+
+    def get_products_url(self, obj):
+        request = self.context.get('request')
+        if request is None:
+            return None
+        return request.build_absolute_uri(f'/api/products/?store_id={obj.id}')
 
     def create(self, validated_data):
         user_id = self.context.get('user_id')
@@ -69,4 +76,10 @@ class StoreSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('User ID is required in context')
 
         user = User.objects.get(id=user_id)
+        if user.role != 'seller':
+            raise serializers.ValidationError('Only sellers can create a store.')
+
+        if Store.objects.filter(user=user).exists():
+            raise serializers.ValidationError('User already has a store.')
+
         return Store.objects.create(user=user, **validated_data)
