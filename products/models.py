@@ -1,4 +1,5 @@
 from django.db import models
+from .validators import validate_file_size
 from users.models import Store
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
@@ -34,18 +35,24 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.store.name}"
 
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to='store/images',
-        # validators=[validate_file_size]
-        )
+        validators=[validate_file_size])
     is_main = models.BooleanField(default=False, verbose_name='Is main image')
+
+    def __str__(self):
+        return f"{self.product.name} - {'Main' if self.is_main else 'Additional'}"
 
 
 class ProductProperties(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='properties')
     name =  models.CharField(max_length=255)
     value = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.name}: {self.value}"
+    

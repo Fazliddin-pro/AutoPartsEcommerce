@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import Product, Category, ProductImage, ProductProperties
 from .serializers import ProductSerializer, CategorySerializer, ProductImageSerializer, ProductPropertiesSerializer
-from .permissions import IsAdminOrReadOnly
+from .permissions import IsAdminOrReadOnly, IsOwnerOrAdminOrSuperuser
 from .filters import ProductFilter
 from .pagination import DefaultPagination
 
@@ -14,7 +14,11 @@ from .pagination import DefaultPagination
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.annotate(products_count=Count('products'))
     serializer_class = CategorySerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    pagination_class = DefaultPagination
     permission_classes = [IsAdminOrReadOnly]
+    search_fields = ['name']
+    ordering_fields = ['price', 'parent']
 
     def destroy(self, request, *args, **kwargs):
         if Product.objects.filter(category_id=kwargs['pk']).exists():
@@ -29,7 +33,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
     pagination_class = DefaultPagination
-    permission_classes = [IsAdminOrReadOnly]
+    permission_classes = [IsOwnerOrAdminOrSuperuser]
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'last_update']
 
@@ -42,6 +46,10 @@ class ProductViewSet(viewsets.ModelViewSet):
 
 class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProductImageSerializer
+    filter_backends = [OrderingFilter]
+    pagination_class = DefaultPagination
+    permission_classes = [IsOwnerOrAdminOrSuperuser]
+    ordering_fields = ['product', 'is_main']
 
     def get_queryset(self):
         return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
@@ -52,6 +60,10 @@ class ProductImageViewSet(viewsets.ModelViewSet):
 
 class ProductPropertiesViewSet(viewsets.ModelViewSet):
     serializer_class = ProductPropertiesSerializer
+    filter_backends = [OrderingFilter]
+    pagination_class = DefaultPagination
+    permission_classes = [IsOwnerOrAdminOrSuperuser]
+    ordering_fields = ['product', 'name']
 
     def get_queryset(self):
         return ProductProperties.objects.filter(product_id=self.kwargs['product_pk'])
