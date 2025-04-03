@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Product, Category
-from .serializers import ProductSerializer, CategorySerializer
+from .models import Product, Category, ProductImage, ProductProperties
+from .serializers import ProductSerializer, CategorySerializer, ProductImageSerializer, ProductPropertiesSerializer
 from .permissions import IsAdminOrReadOnly
 from .filters import ProductFilter
 from .pagination import DefaultPagination
@@ -38,4 +38,24 @@ class ProductViewSet(viewsets.ModelViewSet):
     
     def perform_create(self, serializer):
         serializer.save(store=self.request.user.store)
+
+
+class ProductImageViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductImageSerializer
+
+    def get_queryset(self):
+        return ProductImage.objects.filter(product_id=self.kwargs['product_pk'])
+    
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
+
+
+class ProductPropertiesViewSet(viewsets.ModelViewSet):
+    serializer_class = ProductPropertiesSerializer
+
+    def get_queryset(self):
+        return ProductProperties.objects.filter(product_id=self.kwargs['product_pk'])
+    
+    def get_serializer_context(self):
+        return {'product_id': self.kwargs['product_pk']}
 

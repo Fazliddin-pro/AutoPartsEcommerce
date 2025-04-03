@@ -21,6 +21,7 @@ drf-yasg = "*"
 django-filter = "*"
 django-cors-headers = "*"
 django-debug-toolbar = "*"
+drf-nested-routers = "*"
 
 [dev-packages]
 

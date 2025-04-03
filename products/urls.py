@@ -1,8 +1,12 @@
-from rest_framework.routers import DefaultRouter
-from .views import CategoryViewSet, ProductViewSet
+from rest_framework_nested import routers
+from . import views
 
-router = DefaultRouter()
-router.register(r'categories', CategoryViewSet, basename='category')
-router.register(r'products', ProductViewSet, basename='product')
+router = routers.DefaultRouter()
+router.register(r'categories', views.CategoryViewSet, basename='category')
+router.register(r'products', views.ProductViewSet, basename='product')
 
-urlpatterns = router.urls
+products_router = routers.NestedDefaultRouter(router, 'products', lookup='product')
+products_router.register('images', views.ProductImageViewSet, basename='product-images')
+products_router.register('properties', views.ProductPropertiesViewSet, basename='product-properties')
+
+urlpatterns = router.urls + products_router.urls
