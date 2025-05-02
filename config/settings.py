@@ -76,9 +76,7 @@ INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'https://mrfazld.pythonanywhere.com',
-]
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'config.urls'
 
